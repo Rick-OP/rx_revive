@@ -33,6 +33,10 @@ function respawnPed(ped, coords)
     SetPlayerInvincible(ped, false) 
     TriggerEvent('playerSpawned', coords.x, coords.y, coords.z, coords.heading)
     ClearPedBloodDamage(ped)
+
+    -- Replenish food and water by 50%
+    TriggerEvent('esx_status:remove', 'hunger', 50)
+    TriggerEvent('esx_status:remove', 'thirst', 50)
 end
 
 function revivePed(ped)
@@ -42,6 +46,10 @@ function revivePed(ped)
     NetworkResurrectLocalPlayer(playerPos.x, playerPos.y, playerPos.z, true, true, false)
     SetPlayerInvincible(ped, false)
     ClearPedBloodDamage(ped)
+
+    -- Replenish food and water by 50%
+    TriggerEvent('esx_status:remove', 'hunger', 50)
+    TriggerEvent('esx_status:remove', 'thirst', 50)
 end
 
 function ShowInfoRevive(text1, text2)
