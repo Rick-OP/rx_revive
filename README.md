@@ -19,6 +19,13 @@ To use RPRevive in your FiveM server, follow these steps:
 
 you can modify spawn points within the `client.lua` file to suit your server's needs.
 
+## Changelog
+
+version - 1.0.4
+
+`fixed can't open inventory after revived`
+`fixed food and water 50% after revived`
+
 ## Support
 
 My Discord [join My Discord server](https://discord.gg/qQkDay6DDM)
