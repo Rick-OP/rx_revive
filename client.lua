@@ -41,6 +41,7 @@ function respawnPed(ped, coords)
 end
 
 function revivePed(ped)
+    TriggerEvent('esx:onPlayerSpawn')
     local playerPos = GetEntityCoords(ped, true)
     isDead = false
     timerCount = reviveWait
