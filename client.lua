@@ -36,8 +36,8 @@ function respawnPed(ped, coords)
     ClearPedBloodDamage(ped)
 
     -- Replenish food and water by 50%
-    TriggerEvent('esx_status:remove', 'hunger', 50)
-    TriggerEvent('esx_status:remove', 'thirst', 50)
+    TriggerEvent('esx_status:remove', 'hunger', 100)
+    TriggerEvent('esx_status:remove', 'thirst', 100)
 end
 
 function revivePed(ped)
@@ -51,8 +51,8 @@ function revivePed(ped)
     TriggerEvent('esx:onPlayerSpawn')
 
     -- Replenish food and water by 50%
-    TriggerEvent('esx_status:remove', 'hunger', 50)
-    TriggerEvent('esx_status:remove', 'thirst', 50)
+    TriggerEvent('esx_status:remove', 'hunger', 100)
+    TriggerEvent('esx_status:remove', 'thirst', 100)
 end
 
 function ShowInfoRevive(text1, text2)
