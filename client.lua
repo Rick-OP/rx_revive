@@ -1,119 +1,108 @@
---- Config ---
+local reviveWait = 5 -- Change this to set the wait time for revive in seconds
+local timer = reviveWait
+local isPlayerDead = false
+local notificationShown = false
+local reviveKeyAllowed = true -- Default value, false to disable revive keybind but keep other functions
 
-local reviveWait = 5 -- Change the amount of time to wait before allowing revive (in seconds).
-local featureColor = "~y~" -- Game color used as the button key colors.
+function NotifyPlayer(title, message, messageType, position, duration)
+    TriggerEvent('ox_lib:notify', {
+        title = title,
+        type = messageType,
+        description = message,
+        position = position,
+        duration = duration,
+    })   -- Needs Dependancy ox_lib. or you can add your own notification system
+end
 
---- Code ---
-local timerCount = reviveWait
-local isDead = false
-cHavePerms = true -- Set to true we're bypassing Permission check
-
-AddEventHandler('playerSpawned', function()
-    local src = source
-    TriggerServerEvent("RPRevive:CheckPermission", src)
-end)
-
-RegisterNetEvent("RPRevive:CheckPermission:Return")
-AddEventHandler("RPRevive:CheckPermission:Return", function(havePerms)
-    cHavePerms = havePerms
-end)
-
--- Turn off automatic respawn here instead of updating FiveM file.
-AddEventHandler('onClientMapStart', function()
-    Citizen.Trace("RPRevive: Disabling the autospawn.")
-    exports.spawnmanager:spawnPlayer() -- Ensure player spawns into server.
-    Citizen.Wait(2500)
-    exports.spawnmanager:setAutoSpawn(false)
-    Citizen.Trace("RPRevive: Autospawn is disabled.")
-end)
+function ShowNotify(text)
+    SetNotificationTextEntry("STRING")
+    AddTextComponentSubstringPlayerName(text)
+    DrawNotification(true, true)
+end
 
 function respawnPed(ped, coords)
-    SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
-    NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, coords.heading, true, false) 
-    SetPlayerInvincible(ped, false) 
-    TriggerEvent('playerSpawned', coords.x, coords.y, coords.z, coords.heading)
-    TriggerEvent('esx:onPlayerSpawn')
-    ClearPedBloodDamage(ped)
-
-    -- Replenish food and water by 50%
-    TriggerEvent('esx_status:remove', 'hunger', 100)
-    TriggerEvent('esx_status:remove', 'thirst', 100)
+    local ped = PlayerPedId()
+    local playerId = GetPlayerServerId(PlayerId())
+    if IsEntityDead(ped) then
+        TriggerServerEvent('rxrevive:setRoutingBucket', playerId, 0)
+        SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
+        NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, coords.heading, true, false)
+        SetPlayerInvincible(ped, false)
+        TriggerEvent('playerSpawned', coords.x, coords.y, coords.z, coords.heading)
+        TriggerEvent('esx:onPlayerSpawn')
+        ClearPedBloodDamage(ped)
+    end
 end
+
+RegisterNetEvent('rxrevive:respawn')
+AddEventHandler('rxrevive:respawn', function(ped, coords)
+    respawnPed(ped, coords)
+end)
+
+RegisterNetEvent("rxrevive:revivePlayerClient")
+AddEventHandler("rxrevive:revivePlayerClient", function()
+    local playerId = PlayerPedId()
+    local ped = playerId
+    revivePed(ped)
+    notificationShown = false
+end)
 
 function revivePed(ped)
     TriggerEvent('esx:onPlayerSpawn')
+
     local playerPos = GetEntityCoords(ped, true)
-    isDead = false
-    timerCount = reviveWait
-    NetworkResurrectLocalPlayer(playerPos.x, playerPos.y, playerPos.z, true, true, false)
+    isPlayerDead = false
+    timer = reviveWait
     SetPlayerInvincible(ped, false)
+    NetworkResurrectLocalPlayer(playerPos.x, playerPos.y, playerPos.z, false, true, false)
     ClearPedBloodDamage(ped)
     TriggerEvent('esx:onPlayerSpawn')
-
-    -- Replenish food and water by 50%
-    TriggerEvent('esx_status:remove', 'hunger', 100)
-    TriggerEvent('esx_status:remove', 'thirst', 100)
 end
 
-function ShowInfoRevive(text1, text2)
-    SetNotificationTextEntry("STRING")
-    AddTextComponentSubstringPlayerName(text1)
-    DrawNotification(true, true)
-    SetNotificationTextEntry("STRING")
-    AddTextComponentSubstringPlayerName(text2)
-    DrawNotification(true, true)
-end
+RegisterCommand('selfRevive', function()
+    local ped = PlayerPedId()
+    if IsEntityDead(ped) then
+        if reviveKeyAllowed then
+            if timer <= 0 then
+                revivePed()
+            else
+                NotifyPlayer('Cooldown', 'Wait ' .. timer .. ' seconds before Revive', 'error', 'bottom-right', '1000')
+            end
+        end
+    end
+end, false)
 
+RegisterKeyMapping('selfRevive', 'Revive Key', 'keyboard', 'E')
 
 Citizen.CreateThread(function()
-    local respawnCount = 0
-    local spawnPoints = {}
-    local playerIndex = NetworkGetPlayerIndex(-1) or 0
-    math.randomseed(playerIndex)
-
-    function createSpawnPoint(x, y, z, heading)
-        local newObject = {
-            x = x + 0.0001,
-            y = y + 0.0001,
-            z = z + 0.0001,
-            heading = heading + 0.0001
-        }
-        table.insert(spawnPoints, newObject)
-    end
-
-    createSpawnPoint(-276, -894.06, 31.08, 344.68) -- Example spawn point
-
     while true do
         Citizen.Wait(0)
-        ped = GetPlayerPed(-1)
+        local ped = GetPlayerPed(-1)
         if IsEntityDead(ped) then
-            isDead = true
+            isPlayerDead = true
             SetPlayerInvincible(ped, true)
             SetEntityHealth(ped, 1)
-            ShowInfoRevive('You are Dead. Use ~y~E ~w~to revive here', 'Use ~y~R ~w~to spawn in main Garage')
-            if IsControlJustReleased(0, 38) and GetLastInputMethod(0) then
-                if timerCount <= 0 or cHavePerms then
-                    revivePed(ped)
+            if not notificationShown then
+                if reviveKeyAllowed then
+                    ShowNotify("Use ~y~E ~w~or ~y~Revive Keybind ~w~to Revive")
+                    NotifyPlayer('You are Dead', 'Wait 5 seconds. Press Revive Key', 'error', 'bottom-right', '5000')
+                    notificationShown = true
                 else
-                    TriggerEvent('chat:addMessage', {args = {'^*Wait ' .. timerCount .. ' more seconds before reviving.'}})
-                end 
-            elseif IsControlJustReleased(0, 45) and GetLastInputMethod( 0 ) then
-                local coords = spawnPoints[math.random(1, #spawnPoints)]
-                respawnPed(ped, coords)
-                isDead = false
-                timerCount = reviveWait
-                respawnCount = respawnCount + 1
-                math.randomseed(playerIndex * respawnCount)
+                    notificationShown = true
+                end
             end
+        else
+            isPlayerDead = false
+            notificationShown = false
         end
     end
 end)
 
 Citizen.CreateThread(function()
     while true do
-        if isDead then
-            timerCount = timerCount - 1
+        if isPlayerDead then
+            timer = timer - 1
         end
-        Citizen.Wait(1000)          
+        Citizen.Wait(1000)
     end
 end)
