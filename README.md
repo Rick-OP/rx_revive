@@ -20,8 +20,8 @@ I've added some variables on top of the `client.lua` and `server.lua`. also adde
 
 version - 2.0
 
--- `optimized the script `
--- `addded commands`
+1. `optimized the script `
+2. `addded commands`
 
 ## Support
 
