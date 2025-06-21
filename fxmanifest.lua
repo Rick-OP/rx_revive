@@ -1,14 +1,18 @@
-----------------------------------
---- RP Revive, Made by RICK-OP ---
-----------------------------------
+fx_version 'cerulean'
+games { 'gta5' }
 
-fx_version 'bodacious'
-game 'gta5'
+author 'RICK-OP'
+description 'A simple revive Script'
+version 'v2.0'
 
-author 'RICK-OP/RICKX'
-repository "https://github.com/Rick-OP/RX-RPRevive"
-description 'A simple revive Script. read the readme.md'
-version "v1.0.5"
+lua54 'yes'
+
+dependency 'ox_lib'
+
+shared_script {
+    '@ox_lib/init.lua'
+}
 
 client_script 'client.lua'
+
 server_script 'server.lua'
