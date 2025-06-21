@@ -33,4 +33,4 @@ Contributions to this script are welcome! If you have ideas for improvements or 
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GNU GPL License](LICENSE).
