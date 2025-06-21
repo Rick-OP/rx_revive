@@ -1,47 +1,36 @@
-# RPRevive
+# [ESX] RX REVIVE 
 
-RPRevive is a FiveM resource developed by [RICK-OP](https://github.com/RICK-OP) to manage player revival mechanics in roleplay (RP) servers.
-
-## Overview
-
-RPRevive provides a simple way to revive players. The resource includes features such as cooldowns for revival, manual revival prompts, and customizable spawn points.
+RX REVIVE is a simple esx revive script. players can self revive using keybind. you can use in other frameworks as well, just edit Line 51 and 59 based on you framework. 
 
 ## Installation
 
-To use RPRevive in your FiveM server, follow these steps:
+To use this script in your server
 
 1. Clone or download this repository.
-2. Place the `RPRevive` folder into your FiveM server's `resources` directory.
-3. Add `start RPRevive` to your server.cfg file to ensure RPRevive loads when the server starts.
-4. Customize the resource configuration files (`server.lua` and `client.lua`) as needed.
+2. Place the `rx_revive` folder into your server's `resources` directory.
+3. Download dependancy [ox_lib](https://github.com/overextended/ox_lib) . add it to `resources` directory.
+4. Add `ensure ox_lib` and `ensure rx_revive` to your server.cfg 
+5. Customize the resource configurations in (`server.lua` and `client.lua`) as needed.
 
 ## Configuration
 
-you can modify spawn points within the `client.lua` file to suit your server's needs.
+I've added some variables on top of the `client.lua` and `server.lua`. also added comments for easy configuration.
 
 ## Changelog
 
-version - 1.0.4
+version - 2.0
 
--- `fixed can't open inventory after revived`
--- `fixed food and water 50% after revived`
+-- `optimized the script `
+-- `addded commands`
 
 ## Support
 
-My Discord [join My Discord server](https://discord.gg/qQkDay6DDM)
+Ping me on Discord [RICK-OP](http://discordapp.com/users/878309835484053535)
 
 ## Contribution
 
-Contributions to RPRevive are welcome! If you have ideas for improvements or would like to report a bug, please submit an issue or pull request on GitHub.
-
-## Credits
-
-RPRevive is developed and maintained by [RICK-OP](https://github.com/RICK-OP).
+Contributions to this script are welcome! If you have ideas for improvements or would like to report a bug, please submit an issue or pull request on GitHub.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
----
-
-Join my Discord server for updates and support: [Discord](https://discord.gg/qQkDay6DDM)
